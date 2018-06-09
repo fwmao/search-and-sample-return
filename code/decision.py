@@ -121,6 +121,9 @@ def decision_step(Rover):
             if Rover.near_sample and not Rover.picking_up:
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
+            else:
+                Rover.throttle = Rover.throttle_set
+                Rover.brake = 0
 
     # If in a state where want to pickup a rock send pickup command
     if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
