@@ -42,6 +42,7 @@ class RoverState():
         self.total_time = None # To record total duration of naviagation
         self.stuck_time = None  # To record stuck time of rover
         self.back_time = None  # To record stuck time of rover
+        self.last_sample_time = None
         self.last_yaw = None  # To record stuck time of rover
         self.img = None # Current camera image
         self.pos = None # Current position (x, y)

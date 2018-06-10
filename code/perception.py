@@ -136,7 +136,7 @@ def perception_step(Rover):
         #          Rover.worldmap[navigable_y_world, navigable_x_world, 2] += 1
     Rover.worldmap[y_obs_world, x_obs_world, 0] += 1
     Rover.worldmap[y_w_sample, x_w_sample, 1] += 1
-    if (Rover.roll < 0.5 or Rover.roll > 359) and (Rover.pitch < 0.5 or Rover.pitch > 359):
+    if (Rover.roll < 0.5 or Rover.roll > 359.5) and (Rover.pitch < 0.5 or Rover.pitch > 359.5):
         Rover.worldmap[y_world, x_world, 2] += 1
 
 
@@ -164,7 +164,11 @@ def perception_step(Rover):
             Rover.nav_angles_right = angles_right
         else:
             Rover.nav_angles_right = None
-    else:    # try to find last rock by walking middle of road
-        Rover.nav_angles_right = None
+    elif Rover.samples_collected == 5:    # try to find last rock by walking middle of road
+        if Rover.last_sample_time is None:
+            Rover.last_sample_time = Rover.total_time
+
+        if Rover.total_time - Rover.last_sample_time > 1000:
+            Rover.nav_angles_right = None
 
     return Rover

@@ -1,128 +1,64 @@
-## Project: Search and Sample Return
-
-### [Rubric](https://review.udacity.com/#!/rubrics/916/view) Points
-### Here I consider the rubric points individually and describe how I addressed each point in my implementation.  
-
----
-### Writeup / README
-
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
-
-You're reading it!
-
-### Notebook Analysis
-#### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
-I made the following modifications to the test code (other than process_image() which is described below):
-1. Added a mask to the output of perspect_transform()
-
-2. Modified color_thresh() to accept a 2D array (2x3) of thresholds to include a minimum and maximum threshold for R, G and B
-
-3. Added examples of Original, Warped, Nav Thresholded and Rock Thresholded images
-
-   ![Orig_warp_threshed_rock](./Orig_warp_threshed_rock.JPG)
+[//]: # (Image References)
+[image_0]: ./misc/rover_image.jpg
+[![Udacity - Robotics NanoDegree Program](https://s3-us-west-1.amazonaws.com/udacity-robotics/Extra+Images/RoboND_flag.png)](https://www.udacity.com/robotics)
+# Search and Sample Return Project
 
 
-#### 2. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result.
+![alt text][image_0] 
 
-I made the following modifications to process_image():
+This project is modeled after the [NASA sample return challenge](https://www.nasa.gov/directorates/spacetech/centennial_challenges/sample_return_robot/index.html) and it will give you first hand experience with the three essential elements of robotics, which are perception, decision making and actuation.  You will carry out this project in a simulator environment built with the Unity game engine.  
 
-1. Identified non-navigable areas
+## The Simulator
+The first step is to download the simulator build that's appropriate for your operating system.  Here are the links for [Linux](https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Linux_Roversim.zip), [Mac](	https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Mac_Roversim.zip), or [Windows](https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Windows_Roversim.zip).  
 
-   - Used a lower and upper RGB threshold to identify non-navigable portions of warped image
+You can test out the simulator by opening it up and choosing "Training Mode".  Use the mouse or keyboard to navigate around the environment and see how it looks.
 
-
-   - Incremented those locations in the red channel of the world map
-
-2. Identified non-navigable areas
-
-   - Used a lower and upper RGB threshold to identify navigable portions of warped image
-   - Incremented those locations in the blue channel of the world map
-   - Decremented those locations in the red channel of the world map
-
-3. Identified rocks
-
-   - Used a lower and upper RGB threshold to identify rocks in the warped image
+## Dependencies
+You'll need Python 3 and Jupyter Notebooks installed to do this project.  The best way to get setup with these if you are not already is to use Anaconda following along with the [RoboND-Python-Starterkit](https://github.com/ryan-keenan/RoboND-Python-Starterkit). 
 
 
-   - Incremented those locations in the red channel of the world map
+Here is a great link for learning more about [Anaconda and Jupyter Notebooks](https://classroom.udacity.com/courses/ud1111)
 
-### Autonomous Navigation and Mapping
+## Recording Data
+I've saved some test data for you in the folder called `test_dataset`.  In that folder you'll find a csv file with the output data for steering, throttle position etc. and the pathnames to the images recorded in each run.  I've also saved a few images in the folder called `calibration_images` to do some of the initial calibration steps with.  
 
-#### 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
-In the perception_step() I made the following changes:
+The first step of this project is to record data on your own.  To do this, you should first create a new folder to store the image data in.  Then launch the simulator and choose "Training Mode" then hit "r".  Navigate to the directory you want to store data in, select it, and then drive around collecting data.  Hit "r" again to stop data collection.
 
-1. Minimized error of mapping due to pitch and roll variations of the robot with the following
-   - Ignored the data if the pitch or roll exceeded a threshold
-   - Limited the area of the world map that would be updated to within 20 units of the robot
-     This limited errors due to the pitch making it look like the navigable distance was very far away 
-2. Added a section of code to calculate rock distances and angles
-   - This included adding `Rover.rock_dists` and `Rover.rock_angles` to the Rover object
+## Data Analysis
+Included in the IPython notebook called `Rover_Project_Test_Notebook.ipynb` are the functions from the lesson for performing the various steps of this project.  The notebook should function as is without need for modification at this point.  To see what's in the notebook and execute the code there, start the jupyter notebook server at the command line like this:
 
-In the decision_step() I made the following changes:
+```sh
+jupyter notebook
+```
 
-1. Estimated a new `stopping_dist` based on the average distance to locations between -5 and +5 degrees of forward
+This command will bring up a browser window in the current directory where you can navigate to wherever `Rover_Project_Test_Notebook.ipynb` is and select it.  Run the cells in the notebook from top to bottom to see the various data analysis steps.  
 
-2. Used the new `stopping_dist` to determine when to accelerate or coast
+The last two cells in the notebook are for running the analysis on a folder of test images to create a map of the simulator environment and write the output to a video.  These cells should run as-is and save a video called `test_mapping.mp4` to the `output` folder.  This should give you an idea of how to go about modifying the `process_image()` function to perform mapping on your data.  
 
-3. Calculated a `max_turn` angle based on `Rover.vel`
+## Navigating Autonomously
+### perception_step
+First I record pictures to locate 4 grid corner and threshold of sample rock
+![image](https://github.com/fwmao/search-and-sample-return/tree/master/calibration_images/1.jpg)
+![image](https://github.com/fwmao/search-and-sample-return/blob/master/calibration_images/2.jpg)
 
-4. Used `max_turn` to allow robot to turn more sharply when going slowly
+then I modified color_thresh, add a upper threashold parameter,  
+use rock_sample = color_thresh(warped, rgb_thresh=(150, 100, 0), rgb_thresh_max=(220, 220, 50)), i get the rock_sample image, and obstacle is logical not (nav_image and rock_sample),and i judge roll and pitch degree to increase fidelity.  
+    if (Rover.roll < 0.5 or Rover.roll > 359.5) and (Rover.pitch < 0.5 or Rover.pitch > 359.5):  
+        Rover.worldmap[y_world, x_world, 2] += 1  
+before collecting last sample rock, i used a strategy, drive along right side of road,  use nav_right. when collecting 5th sample rock, i record the time, if spending over 1000S to get the last sample, i will use nav_angle.
+and i add a sample_angles to drive to sample rock, when find a sample in camera.
+### decision_step
+if nav_right exist, rover will use nav_right, if not, rover will use nav_angles instead, but add a random angle limited (-15,15) to avoid drive into repeat route.  
+to avoid being stuck, i add a juage condition and two mode to get off from stuck.  
+if mode is "forward" and steer is 0.2 annd vel < 0.2, rover is being thought as stuck, then will turn into "back" mode, pull back for 2S, then turn into "turn" mode, rover will turn >10 degree than befor yaw angle. under "back" and "turn" mode, nav_right and nav_angle are ignored, until rover vel > 0.2, then will turn back to "forward" mode.
 
-5. Created index list `close_angles` of navigable points that were at a distance of less than 10 units away
-
-6. Used `np.mean(nav_angles[close_angles])` to make steering decisions based on what was navigable within 10 units of the robot
-
-7. Applied a simple low pass filter to `Rover.steer` so it wouldn't vary wildly
-
-8. Added a section of code to navigate toward a rock and stop if it found one
-
-   - This included adding `Rover.rock_dists` and `Rover.rock_angles` to the Rover object
+### more need to do
+1 sometimes sample rock is at the right behind a obstacle, but rover is stuck by the obstacle, the decision tell rover to turn left to avoid stuck, and sample_angle tell rover to steer to sample rock, rover will turn right and left repeatly.  
+2 return to start:  a challenge that I did not implement.
 
 
-   - There is code already in place to pick it up if it stops near a rock
 
-#### 2. Launching in autonomous mode your rover can navigate and map autonomously.    
 
-#### Explain your results and how you might improve them in your writeup.  
 
-##### Results
 
-By running drive_rover.py and launching the simulator in autonomous mode, my rover does a reasonably good job at mapping the environment.
 
-If my rover runs long enough (and doesn't get stuck!), it will map at over 80% of the environment with over 75% fidelity (accuracy) against the ground truth. The fidelity was greatly improved by limiting navigable terrain to locations close to the rover.
-
-It will typically find most rocks, map them on the world map and pick up a few of them.
-
-I ran the simulator at the default resolution of 1024x768 at 'good' quality. With these settings it ran between 8 and 16 FPS.
-
-##### Areas for improvement
-
-###### Compensation of Camera Pitch and Roll
-
-Using the warped image with a fixed transform based on `src` and `dst` to map the navigable areas assumes that the camera does not pitch or roll. When it inevitably does the warped image does not accurately match the ground. I was thinking that it would be good to warp based on the actual dynamic`Rover.pitch` and `Rover.roll` values rather than the fixed `src` and `dst` values. This could effectively compensate for the camera's pitch and roll and produce an accurate warped image and optimize  map fidelity.
-
-###### Wall Following
-
-Wall following can be an effective strategy to insure that a robot maps a simply connected region. If we ignore the rock obstacles in the two open locations this "world" is simply connected and following the right or left hand wall continuously will insure the rover to navigate all regions. As an added bonus all the rock samples are located near the walls. For this to work properly there might have to be an initial "wall-alignment" mode where the rover drove toward the wall and properly aligned itself parallel to the wall.
-
-I tried to have the rover follow the left wall by biasing the steering toward the left by adding a couple of degrees to the `np.mean(nav_angles[close_angles])` . That does bias it to the left but it did not hug the left wall as I had hoped. In order to do that effectively I think it would be more effective to average some number of the left most `nav_angles` to calculate my desired steering direction. This could help optimize the total time to search the "world" and percentage of the "world" mapped.
-
-###### Slow to Steer Sharply 
-
-In some cases it is desirable to make a sharp turn but the rover velocity is too great. It would be good to recognize the desire to make a sharp turn and slow the rover to a speed appropriate for the turn. This could help accurate steering toward a goal or wall following and avoid overshooting or missing a sharp turn and optimize total time to search the "world".
-
-###### Return to start
-
-This was suggested as a potential challenge that I did not implement.
-
-###### Improve Rock Collection
-
-Sometimes the rover is at a bad angle to pick up a rock near the wall due to curvature of the wall or irregularities of the ground by the wall. In these cases it would be ideal if the rover would drive away from the rock sample and wall, then turn around at a point were in line with the rock sample and perpendicular to the wall before approaching the rock sample to pick it up. After it picked up the rock sample it should re-align itself with the wall at that point to continue wall following. This would improve the percentage of rocks successfully collected and help optimize time by insuring that it doesn't get stuck unsuccessfully trying to pick up one rock over and over.
-
-###### Avoid Getting Stuck
-
-In some cases the rover attempted to drive over or under a rock obstacle. Sometimes it was able to do it and some times it got stuck. The obstacles that are on the ground should be recognized in the `nav_angles` and `nav_dists` as locations it should not attempt to drive through. The default implementation just steers to the `np.mean(nav_angles[close_angles])`  which may have a non-navigable area in its center. Ideally the rover would also recognize that some of the obstacles are in its way even though the ground under them looks navigable.
-
-###### Get Un-Stuck
-
-I am sure that no matter how well the implementation avoids getting stuck it will happen once in a while. To handle this case there should be a routine to detect that it is stuck and then try a number of strategies to get unstuck.
