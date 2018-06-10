@@ -36,6 +36,8 @@ This command will bring up a browser window in the current directory where you c
 The last two cells in the notebook are for running the analysis on a folder of test images to create a map of the simulator environment and write the output to a video.  These cells should run as-is and save a video called `test_mapping.mp4` to the `output` folder.  This should give you an idea of how to go about modifying the `process_image()` function to perform mapping on your data.  
 
 ## Navigating Autonomously
+### excution environment: 
+resolution is 800*600, graphics quality is good 
 ### perception_step
 First I record pictures to locate 4 grid corner and threshold of sample rock
 ![image](https://github.com/fwmao/search-and-sample-return/tree/master/calibration_images/1.jpg)

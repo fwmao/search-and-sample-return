@@ -29,7 +29,7 @@ def decision_step(Rover):
                     Rover.throttle = 0
                 Rover.brake = 0
                 if Rover.nav_angles_right:
-                    Rover.steer = np.clip(Rover.nav_angles_right* 180/np.pi,-15, 15)
+                    Rover.steer = np.clip(Rover.nav_angles_right* 180/np.pi + random.randint(-5, 5), -15, 15)
                 else:
                     # Set steering to average angle clipped to the range +/- 15
                     Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi) + random.randint(-15,15), -15, 15)
